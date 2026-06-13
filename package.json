@@ -1,0 +1,19 @@
+{
+  "name": "news-bot-discord",
+  "version": "1.0.0",
+  "description": "Discord bot that posts real-time financial news — forex, stocks, crypto, macro-politics",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": ["discord", "bot", "news", "forex", "stocks", "crypto"],
+  "license": "MIT",
+  "dependencies": {
+    "sql.js": "^1.11.0",
+    "cron": "^3.1.0",
+    "discord.js": "^14.16.0",
+    "dotenv": "^16.4.0",
+    "rss-parser": "^3.13.0"
+  }
+}
