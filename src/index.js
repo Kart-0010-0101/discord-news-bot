@@ -15,30 +15,34 @@ client.once('clientReady', async () => {
   // Initialize database
   await db.init(config.dbPath);
 
-  // Fetch the target channel
-  let channel;
-  try {
-    channel = await client.channels.fetch(config.channelId);
-  } catch (err) {
-    console.error(`❌ Could not fetch channel ${config.channelId}: ${err.message}`);
-    console.error('   Make sure the channel ID is correct and the bot has access.');
+  // Fetch all target channels
+  const channels = [];
+  for (const id of config.channelIds) {
+    try {
+      const ch = await client.channels.fetch(id);
+      if (!ch || !ch.isTextBased()) {
+        console.warn(`⚠️  Channel ${id} is not a text channel — skipping.`);
+        continue;
+      }
+      channels.push(ch);
+      console.log(`📢 Posting to: #${ch.name} (${ch.guild?.name || 'DM'})`);
+    } catch (err) {
+      console.warn(`⚠️  Could not fetch channel ${id}: ${err.message} — skipping.`);
+    }
+  }
+
+  if (channels.length === 0) {
+    console.error('❌ No valid channels found. Check your DISCORD_CHANNEL_IDS.');
     process.exit(1);
   }
 
-  if (!channel || !channel.isTextBased()) {
-    console.error(`❌ Channel ${config.channelId} is not a text channel.`);
-    process.exit(1);
-  }
-
-  console.log(`📢 Posting to: #${channel.name}`);
-
-  // Initialize poster with the channel
-  poster.init(channel);
+  // Initialize poster with all channels
+  poster.init(channels);
 
   // Start the news fetching scheduler
   startScheduler();
 
-  console.log('\n✅ Bot is running! Watching for news...\n');
+  console.log(`\n✅ Bot is running! Posting to ${channels.length} channel(s)...\n`);
 });
 
 // Graceful shutdown

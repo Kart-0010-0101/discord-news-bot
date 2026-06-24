@@ -1,6 +1,6 @@
 # 🤖 Market & Crypto News Discord Bot
 
-A lightweight, robust, and self-contained Discord bot that aggregates, filters, and posts real-time financial, crypto, and macroeconomic news to your Discord server.
+A lightweight, robust, and self-contained Discord bot that aggregates, filters, and posts real-time financial, crypto, and macroeconomic news to one or more Discord servers simultaneously.
 
 ---
 
@@ -12,6 +12,8 @@ A lightweight, robust, and self-contained Discord bot that aggregates, filters, 
   * **Currents API**: For global business, macroeconomics, and market-moving events (polled every 10m).
 * **Smart Relevance Filtering**:
   * Uses regex-based whole-word boundary matching (`\b`) to ensure news matches specific trading categories while avoiding false positives (e.g., matching `"defi"` for Decentralized Finance but correctly ignoring the word `"deficiency"`).
+* **Multi-Server Broadcasting**:
+  * Post the same news feed to multiple channels across different Discord servers from a single deployment.
 * **Rate Limiting & Throttling**:
   * Features a queue-based poster that limits posts to 3 embeds per minute (configurable) to prevent triggering Discord API rate limits during high-volatility news surges.
 * **SQLite Deduplication**:
@@ -51,7 +53,7 @@ A lightweight, robust, and self-contained Discord bot that aggregates, filters, 
 
 ### Prerequisites
 * [Node.js](https://nodejs.org/) (v18+ recommended)
-* A Discord Bot Token and Channel ID
+* A Discord Bot Token and one or more Channel IDs
 
 ### 1. Installation
 Clone or copy the project files to your server and install the dependencies:
@@ -69,7 +71,9 @@ Open `.env` and fill in your credentials:
 ```ini
 # Discord Configuration
 DISCORD_TOKEN=your_discord_bot_token
-DISCORD_CHANNEL_ID=your_discord_channel_id
+
+# Comma-separated channel IDs (supports multiple servers)
+DISCORD_CHANNEL_IDS=channel_id_1,channel_id_2
 
 # News API Credentials
 FINNHUB_API_KEY=your_finnhub_api_key
@@ -83,6 +87,18 @@ The bot is pre-configured to watch for keywords in the following categories (def
 * **Crypto**: e.g., blockchain, bitcoin (BTC), ethereum (ETH), altcoins, DeFI, ETFs, mining.
 * **Macro**: e.g., GDP, trade wars, recession, bond yields, retail sales, oil price/OPEC.
 * **Futures**: e.g., crude oil, gold, silver, copper, wheat, commodities.
+
+### 4. Multi-Server Setup
+To post news to multiple servers from a single bot instance:
+1. Invite the bot to each server via the OAuth2 URL (Developer Portal → OAuth2 → URL Generator → scope: `bot`).
+2. Get the target channel ID from each server (right-click channel → Copy Channel ID).
+3. Add all channel IDs to `DISCORD_CHANNEL_IDS` as a comma-separated list:
+   ```ini
+   DISCORD_CHANNEL_IDS=1234567890,9876543210,5555555555
+   ```
+4. Restart the bot — it will log each channel it connects to on startup.
+
+> **Note**: If a channel ID is invalid or the bot lacks access, it will skip that channel and continue with the rest.
 
 ---
 

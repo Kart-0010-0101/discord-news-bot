@@ -3,7 +3,10 @@ require('dotenv').config();
 const config = {
   // Discord
   discordToken: process.env.DISCORD_TOKEN,
-  channelId: process.env.DISCORD_CHANNEL_ID,
+  channelIds: (process.env.DISCORD_CHANNEL_IDS || '')
+    .split(',')
+    .map(id => id.trim())
+    .filter(Boolean),
 
   // API Keys
   finnhubKey: process.env.FINNHUB_API_KEY,
@@ -72,10 +75,15 @@ const config = {
 // Validate required config
 const required = [
   ['discordToken', 'DISCORD_TOKEN'],
-  ['channelId', 'DISCORD_CHANNEL_ID'],
   ['finnhubKey', 'FINNHUB_API_KEY'],
   ['currentsKey', 'CURRENTS_API_KEY'],
 ];
+
+if (config.channelIds.length === 0) {
+  console.error('❌ Missing required env var: DISCORD_CHANNEL_IDS');
+  console.error('   Provide at least one channel ID (comma-separated for multiple).');
+  process.exit(1);
+}
 
 for (const [key, envName] of required) {
   if (!config[key]) {
